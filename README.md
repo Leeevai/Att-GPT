@@ -1,55 +1,51 @@
 # att-gpt
 
-`att-gpt` is a compact, educational GPT-style language model trained on Shakespeare text.  
-The project is intentionally small enough to read end-to-end while still implementing the full transformer decoder training loop used by modern autoregressive language models.
+`att-gpt` is a compact, professional, and fully documented GPT-style baseline trained on Shakespeare writings.
+It is designed for engineers who want to deeply understand transformer internals and evolve a clean base model into more advanced experiments.
 
-## Why this repository exists
+## Project goals
 
-- Teach transformer internals by implementing every core part in plain PyTorch.
-- Provide a strong base model you can iterate on (bigger context windows, better optimizers, mixed precision, etc.).
-- Keep architecture and implementation decisions explicit and documented.
+- Implement a complete decoder-only transformer in clear PyTorch modules.
+- Keep every architectural choice explicit and documented.
+- Provide reproducible training, generation, and benchmarking workflows.
+- Offer a robust foundation for iterative model development.
 
-## Project structure
+## Documentation index
+
+- `docs/ARCHITECTURE.md` - full transformer architecture and design rationale.
+- `docs/REPOSITORY_GUIDE.md` - repository layout, ownership, and extension map.
+- `docs/TRAINING_RUNBOOK.md` - training workflows, hyperparameter guidance, and troubleshooting.
+- `CONTRIBUTING.md` - contribution and quality standards.
+
+## Repository structure
 
 ```text
 att-gpt/
-├── data/raw/shakespeare.txt      # Training corpus (character-level)
-├── docs/ARCHITECTURE.md          # Full architecture + design rationale
+├── data/raw/shakespeare.txt
+├── docs/
+│   ├── ARCHITECTURE.md
+│   ├── REPOSITORY_GUIDE.md
+│   ├── TRAINING_RUNBOOK.md
+│   └── issues/
 ├── scripts/
-│   ├── train.py                  # Main training CLI
-│   ├── generate.py               # Text generation CLI
-│   └── benchmark.py              # Inference benchmark CLI
+│   ├── train.py
+│   ├── generate.py
+│   └── benchmark.py
 ├── src/att_gpt/
-│   ├── config.py                 # Model/train dataclasses
-│   ├── data.py                   # Corpus loading + batching
-│   ├── device.py                 # Device selection helper
-│   ├── model.py                  # Transformer decoder model
-│   ├── tokenizer.py              # Character tokenizer
-│   ├── trainer.py                # Training loop and checkpointing
-│   └── benchmark/
-│       ├── training.py           # Training benchmark utilities
-│       └── inference.py          # Inference benchmark utilities
+│   ├── benchmark/
+│   ├── config.py
+│   ├── data.py
+│   ├── device.py
+│   ├── model.py
+│   ├── tokenizer.py
+│   └── trainer.py
+├── tests/
 └── pyproject.toml
 ```
 
-## Architecture (high level)
-
-The model follows a decoder-only transformer stack:
-
-1. Character tokens are embedded into dense vectors.
-2. Learned positional embeddings are added.
-3. Repeated transformer blocks perform:
-   - Causal multi-head self-attention.
-   - Position-wise feed-forward network.
-   - Pre-layernorm + residual connections.
-4. Final layer norm + linear language head produce token logits.
-5. Training objective is next-token prediction via cross entropy.
-
-Full details: `docs/ARCHITECTURE.md`.
-
 ## Quick start
 
-### 1) Install
+### 1) Install dependencies
 
 ```bash
 python -m venv .venv
@@ -57,38 +53,44 @@ source .venv/bin/activate
 pip install -e .
 ```
 
-### 2) Train
+### 2) Train a baseline checkpoint
 
 ```bash
 PYTHONPATH=src python scripts/train.py --max-iters 2000 --eval-interval 200
 ```
 
-Artifacts are written to `checkpoints/`:
+Artifacts are saved under `checkpoints/`:
 - `model.pt`
 - `tokenizer.json`
 
-### 3) Generate text
+### 3) Generate text from the checkpoint
 
 ```bash
 PYTHONPATH=src python scripts/generate.py --tokens 400
 ```
 
-### 4) Benchmark inference
+### 4) Measure inference throughput
 
 ```bash
 PYTHONPATH=src python scripts/benchmark.py --tokens 300
 ```
 
-## Implementation principles
+## Reproducibility and quality controls
 
-- **Readable first:** minimal abstraction overhead.
-- **Faithful transformer mechanics:** explicit causal mask, residuals, LN placement.
-- **Measurable:** benchmark modules split from model/training logic.
-- **Extensible:** dataclass configs and modular package structure.
+- Deterministic seed in `TrainConfig`.
+- Isolated benchmark modules for transparent performance measurement.
+- Smoke test at `tests/test_smoke.py`.
+- Backward-compatible root entrypoints (`train.py`, `benchmark.py`) preserved.
 
-## Next extensions
+## Why this baseline is practical
 
-- Add mixed precision + gradient clipping.
-- Add learning-rate warmup/cosine decay.
-- Add BPE tokenization and larger corpora.
-- Add checkpoint resumption and experiment tracking.
+- Small enough to understand fully, yet complete enough for serious iteration.
+- Explicit causal masking and pre-layernorm residual design.
+- Clean separation between model, data, training orchestration, and benchmarks.
+
+## Immediate roadmap
+
+- Gradient clipping and scheduler support.
+- Resume-from-checkpoint training.
+- Richer experiment logging and curves.
+- Tokenization upgrades for larger corpora.

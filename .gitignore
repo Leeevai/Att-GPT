@@ -8,3 +8,13 @@ runs/
 .DS_Store
 .vscode/
 *.ipynb
+.coverage
+htmlcov/
+dist/
+build/
+pip-wheel-metadata/
+.mypy_cache/
+.ruff_cache/
+*.log
+.env
+.env.*
